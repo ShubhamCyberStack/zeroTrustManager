@@ -1,0 +1,371 @@
+/* CSS Variables for all themes */
+:root {
+  --bg: #f0f2f5;
+  --text: #2c3e50;
+  --card: white;
+  --input-bg: white;
+  --input-border: #ccc;
+  --button-bg: #2c3e50;
+  --button-text: white;
+  --card-shadow: rgba(0, 0, 0, 0.05);
+}
+
+/* Light Theme (default) */
+body.light {
+  --bg: #f0f2f5;
+  --text: #2c3e50;
+  --card: white;
+  --input-bg: white;
+  --input-border: #ccc;
+  --button-bg: #2c3e50;
+  --button-text: white;
+  --card-shadow: rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Theme */
+body.dark {
+  --bg: #1e1e2f;
+  --text: #f1f1f1;
+  --card: #2c2c3e;
+  --input-bg: #3a3a4f;
+  --input-border: #555;
+  --button-bg: #34495e;
+  --button-text: white;
+  --card-shadow: rgba(255, 255, 255, 0.05);
+}
+
+/* Autumn Theme */
+body.autumn {
+  --bg: #fff9f0;
+  --text: #5c3d1c;
+  --card: #fff3e0;
+  --input-bg: #fcebd3;
+  --input-border: #d9a76c;
+  --button-bg: #d35400;
+  --button-text: white;
+  --card-shadow: rgba(210, 140, 70, 0.2);
+}
+
+/* Rain Theme */
+body.rain {
+  --bg: #dbeafe;
+  --text: #1e3a8a;
+  --card: #e0f2fe;
+  --input-bg: #eff6ff;
+  --input-border: #93c5fd;
+  --button-bg: #3b82f6;
+  --button-text: white;
+  --card-shadow: rgba(59, 130, 246, 0.2);
+}
+
+/* Spring Theme */
+body.spring {
+  --bg: #f0fff4;
+  --text: #065f46;
+  --card: #e6fffa;
+  --input-bg: #f0fdf4;
+  --input-border: #6ee7b7;
+  --button-bg: #10b981;
+  --button-text: white;
+  --card-shadow: rgba(16, 185, 129, 0.2);
+}
+
+/* Base styles */
+body {
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 1000 !important;
+  background-color: var(--button-bg) !important;
+  color: var(--button-text) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 50px !important;
+  height: 50px !important;
+  font-size: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Form elements */
+input, select, button {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+  border: 1.5px solid var(--button-bg);
+  outline: none;
+}
+
+button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  font-weight: 700;
+  border: none;
+}
+
+button:hover {
+  background-color: #174ea6;
+  transform: translateY(-1px);
+}
+
+/* Container */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px var(--card-shadow);
+}
+
+/* Form containers */
+.form-container {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 32px 24px;
+  box-shadow: 0 4px 24px var(--card-shadow);
+  border: 1px solid var(--input-border);
+  text-align: center;
+  margin: 32px auto;
+}
+
+.form-container h2 {
+  font-size: 2rem;
+  margin-bottom: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Password wrapper for toggle eye button */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 44px;
+}
+
+/* Fix floating eye button issue */
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #888;
+  user-select: none;
+  z-index: 1000;
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  /* No float or absolute conflicts */
+}
+
+/* Switch link styles */
+.switch-link a {
+  color: var(--button-bg);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.switch-link a:hover {
+  color: #174ea6;
+  text-decoration: underline;
+}
+
+/* Password items */
+.password-item {
+  margin-top: 10px;
+  padding: 15px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  border-radius: 8px;
+}
+
+/* Flex row helper */
+.flex-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.flex-row label {
+  margin-right: 8px;
+}
+
+/* Icon buttons */
+.eye-icon, .copy-icon, .edit-icon, .delete-icon, .icon-btn {
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.icon-btn:hover {
+  background: #eaf3fa;
+}
+
+/* Banking details */
+.banking-details {
+  font-size: 15px;
+  line-height: 1.7;
+  background: #f8fcff;
+  padding: 11px 16px;
+  border-radius: 9px;
+  margin: 5px 0 10px 0;
+  box-shadow: 0 1px 5px rgb(60 60 60 / 5%);
+}
+
+.banking-details .label {
+  font-weight: 600;
+}
+
+/* Toast notifications */
+#toast {
+  visibility: hidden;
+  min-width: 200px;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  padding: 12px 20px;
+  position: fixed;
+  z-index: 1000;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+}
+
+#toast.show {
+  visibility: visible;
+  animation: fadein 0.5s, fadeout 0.5s 3s;
+}
+
+@keyframes fadein {
+  from { bottom: 0; opacity: 0; }
+  to { bottom: 30px; opacity: 1; }
+}
+
+@keyframes fadeout {
+  from { bottom: 30px; opacity: 1; }
+  to { bottom: 0; opacity: 0; }
+}
+
+/* Responsive Design - CONSISTENT BUTTON SIZING */
+@media screen and (max-width: 768px) {
+  .theme-toggle-btn {
+    top: 15px !important;
+    right: 15px !important;
+    width: 45px !important;
+    height: 45px !important;
+    font-size: 20px !important;
+  }
+  
+  .container {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .form-container {
+    max-width: 98vw;
+    padding: 18px 6vw;
+    margin: 0;
+    border-radius: 10px;
+  }
+  
+  input, select, button {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  .flex-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .banking-details {
+    padding: 8px 12px;
+    margin-bottom: 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .theme-toggle-btn {
+    top: 10px !important;
+    right: 10px !important;
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 18px !important;
+  }
+  
+  .form-container {
+    padding: 10px 2vw;
+  }
+}
+.logout-btn-beautiful {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px 0;
+  font-size: 1.13rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(90deg,#ef476f 10%, #ffd166 100%);
+  color: #262626;
+  box-shadow: 0 4px 24px rgba(239, 71, 111, 0.10);
+  transition: all 0.2s, transform 0.12s;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+.logout-btn-beautiful:hover {
+  background: linear-gradient(90deg,#ffd166 10%, #ef476f 100%);
+  color: #fff;
+  transform: scale(1.04);
+  box-shadow: 0 6px 30px rgba(239, 71, 111, 0.18);
+}
+

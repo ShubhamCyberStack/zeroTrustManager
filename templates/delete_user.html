@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.delete-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--bg);
+}
+
+.form-container {
+  width: 100%;
+  max-width: 450px;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 32px 24px;
+  box-shadow: 0 4px 24px var(--card-shadow);
+  border: 1px solid var(--input-border);
+  text-align: center;
+}
+
+.form-container h2 {
+  font-size: 2rem;
+  margin-bottom: 18px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.form-container input, .form-container select {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-container button {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #e74c3c;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 14px;
+}
+
+.form-container button:hover {
+  background-color: #c0392b;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 44px;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.step-indicator {
+  margin-bottom: 20px;
+  color: var(--text);
+  opacity: 0.7;
+}
+</style>
+
+<div class="delete-page">
+  <div class="form-container">
+      <h2>🗑️ Delete Account</h2>
+      {% if step == "1" or not step %}
+      <form method="POST" action="{{ url_for('delete_user') }}">
+          <input type="hidden" name="step" value="1">
+          <input type="text" name="username" placeholder="Your username" required>
+          <div class="password-wrapper">
+              <input type="password" name="password" id="delete-password" placeholder="Your password" required>
+              <span class="toggle-password" onclick="togglePassword('delete-password')">👁️</span>
+          </div>
+          <select name="security_question" required>
+              <option value="">Select your security question</option>
+              {% for key, text in questions.items() %}
+                  <option value="{{ key }}">{{ text }}</option>
+              {% endfor %}
+          </select>
+          <input type="text" name="security_answer" placeholder="Your security answer" required>
+          <button type="submit" style="background-color:#d32f2f;">Next →</button>
+      </form>
+
+      {% elif step == "2" %}
+      <form method="POST" action="{{ url_for('delete_user') }}">
+          <input type="hidden" name="step" value="2">
+          <input type="hidden" name="username" value="{{ username }}">
+          <input type="hidden" name="password" value="{{ password }}">
+          <input type="hidden" name="security_question" value="{{ security_question }}">
+          <input type="hidden" name="security_answer" value="{{ security_answer }}">
+          <input type="text" name="otp" placeholder="Enter 6-digit OTP" maxlength="6" required>
+          <button type="submit" style="background-color:#d32f2f;">Next →</button>
+      </form>
+
+      {% elif step == "3" %}
+      <form method="POST" action="{{ url_for('delete_user') }}">
+          <input type="hidden" name="step" value="3">
+          <input type="hidden" name="username" value="{{ username }}">
+          <input type="hidden" name="password" value="{{ password }}">
+          <input type="hidden" name="security_question" value="{{ security_question }}">
+          <input type="hidden" name="security_answer" value="{{ security_answer }}">
+          <input type="hidden" name="otp" value="{{ otp }}">
+          <div class="password-wrapper">
+              <input type="password" name="super_secret_key" id="delete-superkey" placeholder="Enter your Super Secret Key" required>
+              <span class="toggle-password" onclick="togglePassword('delete-superkey')">👁️</span>
+          </div>
+          <button type="submit" style="background-color:#d32f2f;">🗑️ DELETE ACCOUNT PERMANENTLY</button>
+      </form>
+      {% endif %}
+      <div class="switch-link">
+          <a href="/dashboard">← Cancel</a>
+      </div>
+  </div>
+</div>
+
+<script>
+function togglePassword(id) {
+    const input = document.getElementById(id);
+    if (input) {
+        input.type = input.type === "password" ? "text" : "password";
+    }
+}
+</script>
+
+{% endblock %}

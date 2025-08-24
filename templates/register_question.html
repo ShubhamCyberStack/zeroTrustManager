@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--bg);
+}
+
+.form-container {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 32px 24px;
+  box-shadow: 0 4px 24px var(--card-shadow);
+  border: 1px solid var(--input-border);
+  text-align: center;
+}
+
+.form-container h2 {
+  font-size: 2rem;
+  margin-bottom: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.form-container input, .form-container select {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-container button {
+  width: 100%;
+  padding: 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 14px;
+}
+
+.step-indicator {
+  margin-bottom: 20px;
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.info-text {
+  margin-bottom: 20px;
+  color: var(--text);
+  opacity: 0.8;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+</style>
+
+<div class="register-page">
+  <div class="form-container">
+    <div class="step-indicator">Step 2 of 3</div>
+    <h2>Security Question</h2>
+    <p class="info-text">Choose a security question to help recover your account if needed.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul style="color:#e74c3c;text-align:left;padding-left:18px;margin-bottom:12px;">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+      <input type="hidden" name="step" value="2">
+      
+      <select name="security_question" required>
+        <option value="" disabled selected>Select your security question</option>
+        {% for key, text in questions.items() %}
+          <option value="{{ key }}">{{ text }}</option>
+        {% endfor %}
+      </select>
+      
+      <input type="text" name="security_answer" placeholder="Your answer" required>
+      
+      <button type="submit">Continue</button>
+      
+      <p style="margin-top:18px;color:var(--text);">
+        <a href="{{ url_for('register') }}" style="color:var(--button-bg);text-decoration:none;">← Back</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

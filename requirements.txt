@@ -1,0 +1,6 @@
+Flask==2.3.2
+pymongo==4.5.0
+pyotp==2.8.0
+bcrypt==4.0.1
+cryptography==41.0.3
+gunicorn==21.2.0

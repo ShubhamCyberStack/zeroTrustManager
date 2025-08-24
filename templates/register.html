@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register - Zero Trust</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #fff;
+      --card-shadow: rgba(44,62,80,0.08);
+      --input-bg: #f7f9fc;
+      --input-border: #d1d9e6;
+      --button-bg: #2d72d9;
+      --button-text: #fff;
+      --text: #222;
+    }
+    
+    body {
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+    
+    .form-container {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 32px 24px 24px 24px;
+      box-shadow: 0 4px 24px var(--card-shadow);
+      border: 1px solid var(--input-border);
+      box-sizing: border-box;
+      text-align: center;
+      margin: 32px 0;
+    }
+    
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, var(--button-bg), #667eea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background-color: var(--input-bg);
+      color: var(--text);
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus {
+      border: 2px solid var(--button-bg);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(45, 114, 217, 0.1);
+    }
+    
+    /* PASSWORD VISIBILITY TOGGLE - RESTORED */
+    .password-wrapper {
+      position: relative;
+    }
+    
+    .password-wrapper input {
+      padding-right: 44px;
+    }
+    
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #888;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+    
+    .toggle-password:hover {
+      color: var(--button-bg);
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, var(--button-bg), #667eea);
+      color: var(--button-text);
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 14px;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(45, 114, 217, 0.3);
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(45, 114, 217, 0.4);
+    }
+    
+    .switch-link {
+      margin-top: 18px;
+      font-size: 1rem;
+    }
+    
+    .switch-link a {
+      color: var(--button-bg);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    
+    .switch-link a:hover {
+      color: #174ea6;
+      text-decoration: underline;
+    }
+    
+    /* PASSWORD STRENGTH CHECKER - RESTORED */
+    #password-rules,
+    #strength-message {
+      font-size: 13px;
+      margin-top: 4px;
+      text-align: left;
+      padding-left: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    #password-rules {
+      color: #e74c3c;
+      background: rgba(231, 76, 60, 0.1);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border-left: 3px solid #e74c3c;
+      display: none;
+    }
+    
+    #strength-message {
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    
+    /* THEME TOGGLE BUTTON - ENHANCED */
+    #toggle-theme {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 999;
+      background: linear-gradient(135deg, var(--button-bg), #667eea);
+      color: var(--button-text);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(45, 114, 217, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    #toggle-theme:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(45, 114, 217, 0.4);
+    }
+    
+    /* ERROR MESSAGES STYLING */
+    .flash-messages {
+      color: #e74c3c;
+      text-align: left;
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
+      list-style: none;
+    }
+    
+    .flash-messages li {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    
+    /* MOBILE RESPONSIVE */
+    @media (max-width: 600px) {
+      .form-container {
+        max-width: 95vw;
+        padding: 24px 20px;
+        margin: 20px;
+        border-radius: 12px;
+      }
+      
+      #toggle-theme {
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+      }
+      
+      h2 {
+        font-size: 1.6rem;
+      }
+      
+      input, button {
+        font-size: 15px;
+        padding: 13px;
+      }
+      
+      .password-wrapper input {
+        padding-right: 40px;
+      }
+      
+      .toggle-password {
+        right: 12px;
+        font-size: 1.1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .form-container {
+        max-width: 90vw;
+        padding: 20px 16px;
+      }
+      
+      h2 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- THEME TOGGLE BUTTON - RESTORED -->
+  <button id="toggle-theme">🌍</button>
+
+  <div class="form-container">
+    <form method="POST" action="{{ url_for('register') }}">
+      <h2>🛡️ Register</h2>
+      <input type="hidden" name="step" value="1">
+      
+      <!-- FLASH MESSAGES - IMPROVED STYLING -->
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="flash-messages">
+            {% for message in messages %}
+              {% if "register" in message|lower or "password" in message|lower or "username" in message|lower %}
+                <li>{{ message }}</li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+
+      <input type="text" name="username" id="reg-username" placeholder="Username" required>
+
+      <!-- PASSWORD WITH VISIBILITY TOGGLE - RESTORED -->
+      <div class="password-wrapper">
+        <input type="password" name="password" id="reg-password" placeholder="Password" required>
+        <span class="toggle-password" onclick="togglePassword('reg-password')">👁️</span>
+      </div>
+
+      <!-- PASSWORD VALIDATION DISPLAYS - RESTORED -->
+      <div id="password-rules"></div>
+      <div id="strength-message"></div>
+
+      <button type="submit">Continue Registration →</button>
+
+      <p class="switch-link">
+        Already have an account? <a href="{{ url_for('login') }}">Sign In</a><br>
+        <span style="color: #666; font-size: 14px;">
+          Don't want an account anymore? 
+          <a href="{{ url_for('delete_user') }}" style="color: #e74c3c;">🗑️ Delete Account</a>
+        </span>
+      </p>
+    </form>
+  </div>
+
+  <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+  <script>
+    // PASSWORD VISIBILITY TOGGLE FUNCTION - RESTORED
+    function togglePassword(id) {
+      const field = document.getElementById(id);
+      const toggleBtn = field.nextElementSibling;
+      
+      if (field.type === "password") {
+        field.type = "text";
+        toggleBtn.textContent = "🙈";
+      } else {
+        field.type = "password";
+        toggleBtn.textContent = "👁️";
+      }
+    }
+
+    // PASSWORD STRENGTH CHECKER - RESTORED
+    const passwordField = document.getElementById("reg-password");
+    const usernameField = document.getElementById("reg-username");
+    const strengthMessage = document.getElementById("strength-message");
+    const rulesBox = document.getElementById("password-rules");
+
+    const ruleText = {
+      length: "at least 8 characters",
+      uppercase: "an uppercase letter",
+      lowercase: "a lowercase letter",
+      digit: "a number",
+      special: "a special character",
+      username: "not contain the username"
+    };
+
+    // Show/hide rules on focus/blur
+    passwordField.addEventListener("focus", () => {
+      rulesBox.style.display = "block";
+    });
+
+    passwordField.addEventListener("blur", () => {
+      if (passwordField.value === "") {
+        rulesBox.style.display = "none";
+      }
+    });
+
+    // Real-time password validation
+    passwordField.addEventListener("input", function () {
+      const val = passwordField.value;
+      const user = usernameField.value;
+
+      // Calculate password strength
+      let strength = "Weak";
+      let strengthColor = "#e74c3c";
+      
+      if (val.length >= 12 && /[A-Z]/.test(val) && /[a-z]/.test(val) && /\d/.test(val) && /[^A-Za-z0-9]/.test(val)) {
+        strength = "Strong";
+        strengthColor = "#27ae60";
+      } else if (val.length >= 8 && /[A-Z]/.test(val) && /[a-z]/.test(val) && (/\d/.test(val) || /[^A-Za-z0-9]/.test(val))) {
+        strength = "Medium";
+        strengthColor = "#f39c12";
+      }
+
+      // Update strength message
+      strengthMessage.textContent = "Password Strength: " + strength;
+      strengthMessage.style.color = strengthColor;
+      strengthMessage.style.backgroundColor = strengthColor + "20";
+
+      // Check individual rules
+      const rules = {
+        length: val.length >= 8,
+        uppercase: /[A-Z]/.test(val),
+        lowercase: /[a-z]/.test(val),
+        digit: /\d/.test(val),
+        special: /[^A-Za-z0-9]/.test(val),
+        username: !user || !val.toLowerCase().includes(user.toLowerCase())
+      };
+
+      // Show unmet requirements
+      const unmet = Object.keys(rules).filter(r => !rules[r]).map(r => ruleText[r]);
+      if (unmet.length > 0) {
+        rulesBox.textContent = "Missing: " + unmet.join(", ");
+        rulesBox.style.display = "block";
+      } else {
+        rulesBox.textContent = "✅ All requirements met!";
+        rulesBox.style.color = "#27ae60";
+        rulesBox.style.backgroundColor = "rgba(39, 174, 96, 0.1)";
+        rulesBox.style.borderLeft = "3px solid #27ae60";
+      }
+    });
+
+    // ENHANCED THEME INTEGRATION - RESTORED
+    const themeBtn = document.getElementById("toggle-theme");
+
+    function updateThemeIcon(theme) {
+      const themeIcons = {
+        light: "☀️",
+        dark: "🌙",
+        autumn: "🍁",
+        rain: "🌧️",
+        spring: "🌈"
+      };
+      themeBtn.textContent = themeIcons[theme] || "🌍";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const currentTheme = localStorage.getItem("theme") || "light";
+      document.body.classList.add(currentTheme);
+      updateThemeIcon(currentTheme);
+      
+      themeBtn.addEventListener("click", () => {
+        if (typeof cycleTheme === 'function') {
+          cycleTheme();
+          const nextTheme = localStorage.getItem("theme") || "light";
+          updateThemeIcon(nextTheme);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

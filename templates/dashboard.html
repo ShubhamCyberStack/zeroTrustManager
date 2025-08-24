@@ -1,0 +1,1942 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+/* Dashboard-specific styles */
+.dashboard-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 18px;
+  padding-bottom: 90px;
+}
+
+.welcome-header {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+
+/* PROFESSIONAL UNLOCK VAULT STYLING */
+.unlock-vault-container {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--card) 100%);
+}
+
+.unlock-card {
+  max-width: 450px;
+  background: var(--card);
+  border-radius: 24px;
+  padding: 48px 36px;
+  box-shadow: 0 12px 40px var(--card-shadow);
+  text-align: center;
+  border: 1px solid var(--input-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.unlock-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+  transform: rotate(45deg);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+}
+
+.unlock-card-icon {
+  font-size: 4rem;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, var(--button-bg), #667eea);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  z-index: 2;
+}
+
+.unlock-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+}
+
+.unlock-card p {
+  margin-bottom: 32px;
+  font-size: 16px;
+  color: var(--text);
+  opacity: 0.8;
+  position: relative;
+  z-index: 2;
+}
+
+.unlock-form {
+  position: relative;
+  z-index: 2;
+}
+
+.unlock-card input {
+  width: 100%;
+  font-size: 18px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  margin: 12px 0;
+  border: 2px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 4px;
+  text-align: center;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.unlock-card input:focus {
+  border-color: var(--button-bg);
+  box-shadow: 0 0 0 3px rgba(45, 114, 217, 0.1);
+  outline: none;
+}
+
+.unlock-card button {
+  width: 100%;
+  font-size: 18px;
+  padding: 18px 32px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--button-bg), #667eea);
+  color: var(--button-text);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 12px;
+}
+
+.unlock-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(45, 114, 217, 0.3);
+}
+
+.add-password-card {
+  max-width: 580px;
+  margin: 0 auto 35px auto;
+  padding: 30px 25px;
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: 0 5px 20px var(--card-shadow);
+}
+
+.add-password-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.add-password-header span:first-child {
+  font-size: 28px;
+}
+
+.add-password-header span:last-child {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.form-row {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 13px 15px;
+  font-size: 15px;
+  border-radius: 9px;
+}
+
+.collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+.collection-card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 25px 22px;
+  box-shadow: 0 4px 18px var(--card-shadow);
+  border: 1px solid var(--input-border);
+  transition: all 0.3s ease;
+}
+
+.collection-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--card-shadow);
+}
+
+.collection-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 2px solid var(--input-border);
+}
+
+.collection-icon {
+  font-size: 28px;
+}
+
+.collection-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+
+.lock-btn {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 7px;
+  transition: background 0.2s;
+}
+
+.lock-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.collection-unlock-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.collection-unlock-form input {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  text-align: center;
+  font-weight: 600;
+  min-width: 140px;
+}
+
+.collection-unlock-form input::placeholder {
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: normal;
+  text-align: left;
+  font-weight: normal;
+}
+
+.collection-unlock-form button {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.collection-unlock-form button:hover {
+  background: #174ea6;
+  transform: translateY(-1px);
+}
+
+.locked-message {
+  text-align: center;
+  color: #e74c3c;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 14px;
+  background: rgba(231, 76, 60, 0.1);
+  border-radius: 10px;
+}
+
+.password-item {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.password-item:hover {
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+
+.password-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.service-info {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ENHANCED REALISTIC BANKING CARD DESIGN */
+.banking-card {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  border-radius: 15px;
+  padding: 25px 30px;
+  margin: 15px 0;
+  box-shadow: 0 15px 35px rgba(30, 60, 114, 0.4), 0 5px 15px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+  min-height: 240px;
+  width: 100%;
+  max-width: 400px;
+  font-family: 'Courier New', monospace;
+  transform: perspective(1000px) rotateX(0deg);
+  transition: all 0.3s ease;
+}
+
+.banking-card:hover {
+  transform: perspective(1000px) rotateX(-5deg) translateY(-10px);
+  box-shadow: 0 25px 50px rgba(30, 60, 114, 0.6), 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Card Background Pattern */
+.banking-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.banking-card::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -30%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 50%);
+  border-radius: 50%;
+}
+
+/* Card Chip - More Realistic */
+.card-chip {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  width: 40px;
+  height: 30px;
+  background: linear-gradient(145deg, #ffd700, #b8860b);
+  border-radius: 4px;
+  z-index: 4;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(255,255,255,0.2);
+}
+
+.card-chip::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+  background: linear-gradient(145deg, #333, #666);
+  border-radius: 2px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px;
+}
+
+/* Bank Logo Area */
+.bank-logo {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 18px;
+  font-weight: bold;
+  color: rgba(255,255,255,0.9);
+  z-index: 4;
+}
+
+/* Card Network (Visa/Mastercard style) */
+.card-network {
+  position: absolute;
+  bottom: 20px;
+  right: 25px;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  z-index: 4;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+}
+
+/* Card Type Display */
+.card-type {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 3;
+  color: rgba(255,255,255,0.9);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Card Details Grid */
+.card-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 25px;
+  position: relative;
+  z-index: 3;
+}
+
+/* Individual Card Fields */
+.card-field {
+  background: rgba(255,255,255,0.12);
+  padding: 12px 15px;
+  border-radius: 8px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.15);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.card-field:hover {
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+}
+
+.field-label {
+  font-size: 9px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.8);
+}
+
+.field-value {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+  color: white;
+  line-height: 1.2;
+}
+
+/* Special styling for card number */
+.card-field[data-field="number"] .field-value {
+  font-size: 16px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+/* ENHANCED REALISTIC CARD TYPES - FIXED GRADIENTS AND SHADOWS */
+.banking-card.debit-card {
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 25%, #4a90e2 100%);
+  box-shadow: 
+    0 20px 40px rgba(74, 144, 226, 0.4), 
+    0 8px 25px rgba(26, 54, 93, 0.6),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.banking-card.credit-card {
+  background: linear-gradient(135deg, #744210 0%, #c53030 25%, #ff6b6b 100%);
+  box-shadow: 
+    0 20px 40px rgba(255, 107, 107, 0.4), 
+    0 8px 25px rgba(197, 48, 48, 0.6),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.banking-card.online-banking {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 25%, #38a169 100%);
+  box-shadow: 
+    0 20px 40px rgba(56, 161, 105, 0.4), 
+    0 8px 25px rgba(26, 32, 44, 0.6),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Card Hologram Effect */
+.card-hologram {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.banking-card:hover .card-hologram {
+  opacity: 1;
+}
+
+/* Actions Row for Banking Cards - FIXED POSITIONING */
+.actions-row {
+  display: flex !important;
+  justify-content: space-around !important;
+  gap: 8px !important;
+  margin-top: 20px !important;
+  position: relative !important;
+  z-index: 5 !important;
+  flex-wrap: wrap !important;
+}
+
+.action-btn {
+  background: rgba(255,255,255,0.2) !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  color: white !important;
+  cursor: pointer !important;
+  font-size: 11px !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(10px) !important;
+  font-weight: 500 !important;
+  flex: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  min-width: 60px !important;
+  position: static !important;
+  float: none !important;
+}
+
+.action-btn:hover {
+  background: rgba(255,255,255,0.3) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+}
+
+/* FIXED REGULAR PASSWORD DISPLAY - NO MORE FLOATING BUTTONS */
+.regular-password {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--input-bg);
+  padding: 14px 17px;
+  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  position: relative;
+}
+
+.regular-password .actions-row {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  flex-shrink: 0 !important;
+  width: auto !important;
+  display: flex !important;
+  gap: 8px !important;
+}
+
+.regular-password .action-btn {
+  background: var(--button-bg) !important;
+  color: var(--button-text) !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  border-radius: 8px !important;
+  min-width: 50px !important;
+  position: static !important;
+  border: none !important;
+  float: none !important;
+  display: inline-block !important;
+}
+
+.regular-password .action-btn:hover {
+  background: #174ea6 !important;
+}
+
+.password-value {
+  font-family: 'Courier New', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.verify-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: rgba(52, 152, 219, 0.1);
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #3498db;
+}
+
+.verify-form input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #3498db;
+  font-size: 16px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.verify-form input::placeholder {
+  font-family: 'Segoe UI', sans-serif;
+  letter-spacing: normal;
+  text-align: left;
+  font-weight: normal;
+}
+
+.verify-form button {
+  padding: 14px 18px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 35px 18px;
+  color: #666;
+  font-size: 15px;
+}
+
+.bottom-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--input-border);
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 -3px 15px var(--card-shadow);
+  z-index: 100;
+}
+
+.bottom-actions .action-group {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 14px 26px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.lock-vault-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  padding: 14px 26px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 12px rgba(231, 76, 60, 0.3);
+}
+
+.lock-vault-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* ========= SEARCH FEATURE CSS ========= */
+.search-bar {
+  display: none;
+  margin: 10px 0;
+  padding: 12px;
+  background: var(--input-bg);
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+}
+
+.search-bar input {
+  padding: 8px;
+  font-size: 0.95rem;
+  margin-right: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  width: 60%;
+}
+
+.search-btn {
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin: 0 2px;
+}
+
+.search-btn:hover {
+  background: #174ea6;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: var(--card);
+  margin: auto;
+  padding: 20px;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 32px var(--card-shadow);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: var(--text);
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.modal-content button {
+  padding: 12px 20px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-content button:hover {
+  background: #174ea6;
+}
+
+/* Banking Edit Sections */
+.banking-edit-section {
+  background: var(--input-bg);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  margin: 10px 0;
+}
+
+.banking-edit-section h4 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 1px solid var(--input-border);
+  padding-bottom: 8px;
+}
+
+.banking-edit-section input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  background: var(--card);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+/* Toast Notification */
+#toast {
+  visibility: hidden;
+  min-width: 250px;
+  margin-left: -125px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 8px;
+  padding: 16px;
+  position: fixed;
+  z-index: 10001;
+  left: 50%;
+  bottom: 30px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+#toast.show {
+  visibility: visible;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+/* SEARCH RESULTS SPECIFIC STYLING */
+.search-result-banking-card {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 20px 25px;
+  margin: 10px 0;
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+  font-family: 'Courier New', monospace;
+}
+
+.search-result-banking-card.debit-card {
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 25%, #4a90e2 100%);
+}
+
+.search-result-banking-card.credit-card {
+  background: linear-gradient(135deg, #744210 0%, #c53030 25%, #ff6b6b 100%);
+}
+
+.search-result-banking-card.online-banking {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 25%, #38a169 100%);
+}
+
+.search-chip {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 30px;
+  height: 22px;
+  background: linear-gradient(145deg, #ffd700, #b8860b);
+  border-radius: 3px;
+  z-index: 2;
+}
+
+/* Mobile & Tablet Responsive Design */
+@media (max-width: 1024px) {
+  .collections-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 18px;
+  }
+  
+  .dashboard-container {
+    padding: 15px;
+    padding-bottom: 85px;
+  }
+  
+  .add-password-card {
+    max-width: 100%;
+    margin-bottom: 25px;
+    padding: 25px 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .collections-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .card-details {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .actions-row {
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+  
+  .action-btn {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    min-width: 60px !important;
+  }
+  
+  .bottom-actions {
+    padding: 15px;
+  }
+  
+  .bottom-actions .action-group {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .logout-btn, .lock-vault-btn {
+    width: 100%;
+    justify-content: center;
+    max-width: 220px;
+  }
+  
+  .password-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .regular-password {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .welcome-header {
+    font-size: 1.7rem;
+    margin-bottom: 22px;
+  }
+  
+  .collection-unlock-form {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .collection-unlock-form button {
+    width: 100%;
+  }
+
+  .unlock-card {
+    max-width: 95vw;
+    padding: 32px 24px;
+    margin: 20px auto;
+  }
+
+  .banking-card, .search-result-banking-card {
+    padding: 25px 20px;
+    min-height: 200px;
+  }
+
+  .add-password-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .search-bar input {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 12px;
+    padding-bottom: 80px;
+  }
+  
+  .collection-card {
+    padding: 20px 15px;
+  }
+  
+  .banking-card, .search-result-banking-card {
+    padding: 20px 15px;
+    min-height: 160px;
+  }
+  
+  .add-password-header span:first-child {
+    font-size: 24px;
+  }
+  
+  .add-password-header span:last-child {
+    font-size: 17px;
+  }
+  
+  .bottom-actions {
+    padding: 12px;
+  }
+  
+  .logout-btn, .lock-vault-btn {
+    font-size: 14px;
+    padding: 12px 22px;
+  }
+
+  .unlock-card {
+    padding: 24px 20px;
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <h2 class="welcome-header">Welcome, {{ session.username }}</h2>
+
+  {% if not unlocked %}
+    <div class="unlock-vault-container">
+      <div class="unlock-card">
+        <div class="unlock-card-icon">🔐</div>
+        <h3>Unlock Your Vault</h3>
+        <p>Enter your OTP to access your secure password vault</p>
+        <form method="POST" class="unlock-form">
+          <input type="hidden" name="action" value="unlock">
+          <input type="text" name="otp" placeholder="Enter 6-digit OTP" required maxlength="6">
+          <button type="submit">🔓 Unlock Vault</button>
+        </form>
+        <form method="GET" action="/logout">
+  <button type="submit" class="logout-btn-beautiful">Logout</button>
+</form>
+
+      </div>
+    </div>
+
+  {% else %}
+
+    <!-- Add Password Section -->
+    <div class="add-password-card">
+      <div class="add-password-header">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span>➕</span>
+          <span>Add New Password</span>
+        </div>
+        <button class="search-btn" onclick="showGlobalSearchModal()">🔍 Search All</button>
+      </div>
+      <form method="POST" id="addPasswordForm">
+        <input type="hidden" name="action" value="add">
+        
+        <div class="form-row">
+          <input type="text" name="service" placeholder="Service Name" required>
+          <input type="text" name="account" placeholder="Account/Email" required>
+        </div>
+        
+        <select name="collection" id="collectionSelect" required style="margin-bottom:14px;">
+          <option value="">Select Collection</option>
+          <option value="banking">🏦 Banking Credentials</option>
+          <option value="social">📱 Social Media</option>
+          <option value="other">🔑 Other Passwords</option>
+        </select>
+        
+        <div id="bankingSubTypeContainer" style="display:none;margin-bottom:14px;">
+          <select id="bankingSubType" name="banking_type">
+            <option value="">Select Banking Type</option>
+            <option value="debit">💳 Debit Card</option>
+            <option value="credit">💳 Credit Card</option>
+            <option value="online">🌐 Online Banking</option>
+          </select>
+        </div>
+        
+        <div id="credentialFields" style="margin-bottom:14px;">
+          <input type="text" name="password" placeholder="Password (leave blank for auto-generate)">
+        </div>
+        
+        <input type="text" name="otp" placeholder="Enter OTP for verification" required maxlength="6" style="font-family:'Courier New',monospace;letter-spacing:4px;text-align:center;font-weight:600;">
+        <button type="submit" style="width:100%;margin-top:10px;">✨ Add Password</button>
+      </form>
+    </div>
+
+    <!-- Collections Grid -->
+    <div class="collections-grid">
+      {% for coll in ["banking", "social", "other"] %}
+        {% set can_view_coll = otp_verified or unlocked_collections.get(coll) %}
+        <div class="collection-card">
+          
+          <div class="collection-header">
+            <span class="collection-icon">{% if coll == "banking" %}🏦{% elif coll == "social" %}📱{% else %}🔑{% endif %}</span>
+            <span class="collection-title">{{ coll.capitalize() }} Collection</span>
+            {% if unlocked_collections.get(coll) %}
+              <button class="search-btn" onclick="toggleCollectionSearch('{{coll}}')">🔍 Search</button>
+              <form method="POST" action="/relock_collection" style="display:inline;">
+                <input type="hidden" name="collection" value="{{ coll }}">
+                <button type="submit" class="lock-btn">🔒 Lock</button>
+              </form>
+            {% endif %}
+          </div>
+
+          {% if not unlocked_collections.get(coll) %}
+            <form method="POST" action="/unlock_collection" class="collection-unlock-form">
+              <input type="hidden" name="collection" value="{{ coll }}">
+              <input type="text" name="otp" placeholder="Enter OTP to unlock" required maxlength="6">
+              <button type="submit">🔓 Unlock</button>
+            </form>
+            <div class="locked-message">
+              🔒 Collection locked for security
+            </div>
+            
+          {% else %}
+            <!-- Search bar for this collection -->
+            <div id="{{coll}}-search-bar" class="search-bar">
+              <input type="text" id="{{coll}}-search-input" placeholder="Search {{coll}}...">
+              <button type="button" class="search-btn" onclick="searchCollection('{{coll}}')">Search</button>
+              <button type="button" class="search-btn" style="background:#666;" onclick="clearCollectionSearch('{{coll}}')">Clear</button>
+            </div>
+            <div id="{{coll}}-search-results"></div>
+
+            {% if vaults[coll] %}
+              <div id="{{coll}}-vault-items">
+                {% for item in vaults[coll] %}
+                  <div class="password-item">
+                    <div class="password-header">
+                      <div class="service-info">
+                        <strong>{{ item.service }}</strong><br>
+                        <small style="color:#666;font-weight:normal;">{{ item.account }}</small>
+                      </div>
+                    </div>
+
+                    {% if can_view_coll %}
+                      {% if coll == "banking" and item.password.startswith('TYPE:') %}
+                        <!-- Enhanced Realistic Banking Card Display -->
+                        {% set fields = item.password.split('|') %}
+                        {% set card_type = fields[0].split(':')[1]|lower %}
+                        
+                        <div class="banking-card {{ card_type }}-card">
+                          <div class="card-hologram"></div>
+                          <div class="card-chip"></div>
+                          <div class="bank-logo">{{ item.service|upper }}</div>
+                          <div class="card-network">
+                            {% if card_type == 'debit' %}DEBIT
+                            {% elif card_type == 'credit' %}CREDIT
+                            {% elif card_type == 'online' %}ONLINE
+                            {% endif %}
+                          </div>
+                          
+                          <div class="card-type">
+                            {% if card_type == 'debit' %}💳 Debit Card
+                            {% elif card_type == 'credit' %}💳 Credit Card  
+                            {% elif card_type == 'online' %}🌐 Online Banking
+                            {% endif %}
+                          </div>
+                          
+                          <div class="card-details">
+                            {% for f in fields[1:] %}
+                              {% set parts = f.split(':') %}
+                              {% set k = parts[0] %}
+                              {% set v = parts[1] if parts|length > 1 else '' %}
+                              
+                              {% if k == "CARD" %}
+                                <div class="card-field" data-field="number">
+                                  <div class="field-label">Card Number</div>
+                                  <div class="field-value banking-field" data-type="CARD" data-raw="{{ v }}">{{ v[:4] }} •••• •••• {{ v[-4:] }}</div>
+                                </div>
+                              {% elif k == "EXP" %}
+                                <div class="card-field">
+                                  <div class="field-label">Expiry Date</div>
+                                  <div class="field-value banking-field" data-type="EXP" data-raw="{{ v }}">••/••</div>
+                                </div>
+                              {% elif k == "CVV" %}
+                                <div class="card-field">
+                                  <div class="field-label">Security Code</div>
+                                  <div class="field-value banking-field" data-type="CVV" data-raw="{{ v }}">***</div>
+                                </div>
+                              {% elif k == "USER" %}
+                                <div class="card-field">
+                                  <div class="field-label">Account Holder</div>
+                                  <div class="field-value banking-field" data-type="USER" data-raw="{{ v }}">{{ v|upper }}</div>
+                                </div>
+                              {% elif k == "PASS" %}
+                                <div class="card-field">
+                                  <div class="field-label">PIN/Password</div>
+                                  <div class="field-value banking-field" data-type="PASS" data-raw="{{ v }}">••••••••</div>
+                                </div>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
+                          
+                          <div class="actions-row">
+                            <button class="action-btn toggle-item-visibility" title="Show/Hide details">👁️ View</button>
+                            <button class="action-btn copy-banking" data-service="{{ item.service }}" data-account="{{ item.account }}" title="Copy details">📋 Copy</button>
+                            <button class="action-btn edit-banking" data-service="{{ item.service }}" data-account="{{ item.account }}" title="Edit">✏️ Edit</button>
+                            <button class="action-btn delete-banking" data-service="{{ item.service }}" data-account="{{ item.account }}" title="Delete">🗑️ Delete</button>
+                          </div>
+                        </div>
+                        
+                      {% else %}
+                        <!-- Regular Password Display -->
+                        <div class="regular-password">
+                          <div>
+                            <div class="field-label" style="font-size:11px;color:#666;margin-bottom:5px;">PASSWORD</div>
+                            <div class="password-value masked-password" data-raw="{{ item.password }}">••••••••••••</div>
+                          </div>
+                          <div class="actions-row">
+                            <button class="action-btn toggle-password" title="Show/Hide password">👁️</button>
+                            <button class="action-btn copy-password" data-password="{{ item.password }}" title="Copy password">📋</button>
+                            <button class="action-btn edit-password" data-service="{{ item.service }}" data-account="{{ item.account }}" title="Edit">✏️</button>
+                            <button class="action-btn delete-password" data-service="{{ item.service }}" data-account="{{ item.account }}" title="Delete">🗑️</button>
+                          </div>
+                        </div>
+                      {% endif %}
+                      
+                    {% else %}
+                      <!-- OTP Verification -->
+                      <form method="post" class="verify-form">
+                        <input type="hidden" name="action" value="verify_view_otp">
+                        <span>🔐</span>
+                        <input type="text" name="otp" placeholder="Enter OTP to view" required maxlength="6">
+                        <button type="submit">Verify</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="empty-state">
+                <div style="font-size:42px;margin-bottom:12px;">📝</div>
+                <div>No passwords saved yet</div>
+                <div style="font-size:13px;margin-top:8px;opacity:0.7;">Add your first password above</div>
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+  {% endif %}
+</div>
+
+<!-- Bottom Actions Bar -->
+{% if unlocked %}
+<div class="bottom-actions">
+  <div class="action-group">
+    <a href="{{ url_for('logout') }}" class="logout-btn">
+      🚪 <span>Logout</span>
+    </a>
+    
+    <form method="POST" action="/relock" style="display:inline;">
+      <button type="submit" class="lock-vault-btn">
+        🔒 <span>Lock Vault</span>
+      </button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<!-- Global Search Modal -->
+<div id="globalSearchModal" class="modal">
+  <div class="modal-content">
+    <h3>🔑 Search All Collections</h3>
+    <div id="globalSearchStepOTP">
+      <input type="text" id="globalSearchOtp" placeholder="Enter OTP to unlock search" maxlength="6">
+      <button onclick="verifyGlobalSearchOTP()">Unlock Search</button>
+    </div>
+    <div id="globalSearchStepForm" style="display:none;">
+      <input type="text" id="globalSearchQuery" placeholder="Search across all collections...">
+      <button onclick="performGlobalSearch()">Search</button>
+      <div id="globalSearchResults" style="margin-top:15px;"></div>
+    </div>
+    <button onclick="closeGlobalSearchModal()" style="background:#666;">Cancel</button>
+  </div>
+</div>
+
+<!-- Enhanced Edit Modal for Banking Cards -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h3 id="editModalTitle">Edit Password</h3>
+    <form method="POST" id="editForm">
+      <input type="hidden" name="action" value="edit">
+      <input type="hidden" id="editService" name="service">
+      <input type="hidden" id="editAccount" name="account">
+      <input type="hidden" id="editPasswordType" name="password_type" value="regular">
+      
+      <!-- Regular Password Fields -->
+      <div id="regularPasswordFields">
+        <input type="password" id="editNewPassword" name="new_password" placeholder="New Password" required>
+      </div>
+      
+      <!-- Banking Card Fields -->
+      <div id="bankingCardFields" style="display:none;">
+        <div class="banking-edit-section">
+          <h4 style="margin: 10px 0; color: var(--text);">Card Details</h4>
+          <input type="text" id="editCardNumber" name="card_number" placeholder="Card Number (16 digits)" style="margin-bottom:10px;">
+          <input type="text" id="editExpiry" name="expiry" placeholder="MM/YY" style="margin-bottom:10px;">
+          <input type="text" id="editCVV" name="cvv" placeholder="CVV (3-4 digits)" style="margin-bottom:10px;">
+        </div>
+      </div>
+      
+      <!-- Online Banking Fields -->
+      <div id="onlineBankingFields" style="display:none;">
+        <div class="banking-edit-section">
+          <h4 style="margin: 10px 0; color: var(--text);">Banking Credentials</h4>
+          <input type="text" id="editBankingUser" name="banking_username" placeholder="Username/Account ID" style="margin-bottom:10px;">
+          <input type="password" id="editBankingPassword" name="banking_password" placeholder="Banking Password" style="margin-bottom:10px;">
+        </div>
+      </div>
+      
+      <input type="text" name="otp" placeholder="Enter OTP" required maxlength="6" style="font-family:'Courier New',monospace;letter-spacing:2px;text-align:center;">
+      <div style="display:flex;gap:10px;margin-top:15px;">
+        <button type="submit" style="flex:1;">Update</button>
+        <button type="button" onclick="closeModal()" style="flex:1;background:#666;">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content">
+    <h3>Delete Password</h3>
+    <p>Are you sure you want to delete this password?</p>
+    <form method="POST" id="deleteForm">
+      <input type="hidden" name="action" value="delete">
+      <input type="hidden" id="deleteService" name="service">
+      <input type="hidden" id="deleteAccount" name="account">
+      <input type="text" name="otp" placeholder="Enter OTP" required maxlength="6" style="font-family:'Courier New',monospace;letter-spacing:2px;text-align:center;">
+      <div style="display:flex;gap:10px;margin-top:15px;">
+        <button type="submit" style="flex:1;background:#e74c3c;">Delete</button>
+        <button type="button" onclick="closeModal()" style="flex:1;background:#666;">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast"></div>
+
+<script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+<script>
+// AUTO-LOCK FUNCTIONALITY - 2 MINUTES INACTIVITY
+let inactivityTimer;
+let lastActivity = Date.now();
+
+function resetInactivityTimer() {
+  lastActivity = Date.now();
+  clearTimeout(inactivityTimer);
+  
+  inactivityTimer = setTimeout(() => {
+    if (window.location.pathname === '/dashboard') {
+      fetch('/relock', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        }
+      }).then(() => {
+        // Clear global search unlock on auto-lock
+        sessionStorage.removeItem('globalSearchUnlocked');
+        window.location.reload();
+      });
+    }
+  }, 120000); // 2 minutes
+}
+
+// Track user activity
+document.addEventListener('mousedown', resetInactivityTimer);
+document.addEventListener('mousemove', resetInactivityTimer);
+document.addEventListener('keypress', resetInactivityTimer);
+document.addEventListener('scroll', resetInactivityTimer);
+document.addEventListener('touchstart', resetInactivityTimer);
+
+// Initialize timer
+resetInactivityTimer();
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Banking collection type handling
+  const collectionSelect = document.getElementById('collectionSelect');
+  const bankingContainer = document.getElementById('bankingSubTypeContainer');
+  const bankingSubType = document.getElementById('bankingSubType');
+  const credentialFields = document.getElementById('credentialFields');
+
+  if (collectionSelect) {
+    collectionSelect.addEventListener('change', function() {
+      if (this.value === 'banking') {
+        bankingContainer.style.display = 'block';
+      } else {
+        bankingContainer.style.display = 'none';
+        updateCredentialFields('other');
+      }
+    });
+  }
+
+  if (bankingSubType) {
+    bankingSubType.addEventListener('change', function() {
+      updateCredentialFields(this.value);
+    });
+  }
+
+  function updateCredentialFields(type) {
+    let html = '';
+    if (type === 'debit' || type === 'credit') {
+      html = `
+        <input type="text" name="card_number" placeholder="Card Number (16 digits)" required style="margin-bottom:10px;">
+        <input type="text" name="expiry" placeholder="MM/YY" required style="margin-bottom:10px;">
+        <input type="text" name="cvv" placeholder="CVV (3-4 digits)" required>
+      `;
+    } else if (type === 'online') {
+      html = `
+        <input type="text" name="account" placeholder="Username/Account ID" required style="margin-bottom:10px;">
+        <input type="password" name="password" placeholder="Banking Password" required>
+      `;
+    } else {
+      html = '<input type="text" name="password" placeholder="Password (leave blank for auto-generate)">';
+    }
+    credentialFields.innerHTML = html;
+  }
+
+  // Toggle password visibility - FIXED
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('toggle-password')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const passwordDiv = e.target.closest('.regular-password').querySelector('.password-value');
+      const isHidden = passwordDiv.textContent.includes('•');
+      passwordDiv.textContent = isHidden ? passwordDiv.getAttribute('data-raw') : '••••••••••••';
+      e.target.innerHTML = isHidden ? '🙈' : '👁️';
+    }
+  });
+
+  // Toggle banking field visibility - FIXED
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('toggle-item-visibility')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const card = e.target.closest('.banking-card, .search-result-banking-card');
+      const fields = card.querySelectorAll('.banking-field');
+      let isShowing = false;
+      
+      fields.forEach(field => {
+        const type = field.getAttribute('data-type');
+        const raw = field.getAttribute('data-raw') || '';
+        
+        const isHidden = field.textContent.includes('•') || field.textContent.includes('*');
+        if (!isShowing && !isHidden) isShowing = true;
+        
+        if (type === 'CARD') {
+          field.textContent = isHidden ? raw : (raw.slice(0,4) + " •••• •••• " + raw.slice(-4));
+        } else if (type === 'EXP') {
+          field.textContent = isHidden ? raw : "••/••";
+        } else if (type === 'CVV') {
+          field.textContent = isHidden ? raw : "***";
+        } else if (type === 'PASS') {
+          field.textContent = isHidden ? raw : "••••••••";
+        } else if (type === 'USER') {
+          field.textContent = isHidden ? raw.toUpperCase() : "••••••••";
+        }
+      });
+      
+      e.target.innerHTML = isShowing ? '👁️ View' : '🙈 Hide';
+    }
+  });
+
+  // Copy functionality
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('copy-password')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const password = e.target.getAttribute('data-password');
+      navigator.clipboard.writeText(password).then(() => {
+        showToast('Password copied to clipboard!');
+      });
+    }
+    
+    if (e.target.classList.contains('copy-banking')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const card = e.target.closest('.banking-card, .search-result-banking-card');
+      const fields = card.querySelectorAll('.banking-field');
+      let copyText = '';
+      fields.forEach(field => {
+        const raw = field.getAttribute('data-raw');
+        const type = field.getAttribute('data-type');
+        if (raw) {
+          copyText += `${type}: ${raw}\n`;
+        }
+      });
+      navigator.clipboard.writeText(copyText).then(() => {
+        showToast('Banking details copied!');
+      });
+    }
+  });
+
+  // FIXED: Enhanced Edit functionality for Banking Cards with proper online banking detection
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('edit-password') || e.target.classList.contains('edit-banking')) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const service = e.target.getAttribute('data-service');
+      const account = e.target.getAttribute('data-account');
+      
+      // Get the password item to check if it's a banking card
+      const passwordItem = e.target.closest('.password-item');
+      const bankingCard = passwordItem.querySelector('.banking-card, .search-result-banking-card');
+      
+      document.getElementById('editService').value = service;
+      document.getElementById('editAccount').value = account;
+      
+      if (bankingCard) {
+        // Check specifically for online banking first
+        if (bankingCard.classList.contains('online-banking')) {
+          // FIXED: Online Banking Edit Modal
+          document.getElementById('editModalTitle').textContent = 'Edit Online Banking';
+          document.getElementById('editPasswordType').value = 'online';
+          
+          // Show online banking fields, hide others
+          document.getElementById('regularPasswordFields').style.display = 'none';
+          document.getElementById('bankingCardFields').style.display = 'none';
+          document.getElementById('onlineBankingFields').style.display = 'block';
+          
+          // Pre-fill current values
+          const userField = bankingCard.querySelector('[data-type="USER"]');
+          const passField = bankingCard.querySelector('[data-type="PASS"]');
+          
+          if (userField) {
+            document.getElementById('editBankingUser').value = userField.getAttribute('data-raw') || '';
+          }
+          if (passField) {
+            document.getElementById('editBankingPassword').value = passField.getAttribute('data-raw') || '';
+          }
+          
+          // Make banking fields required
+          document.getElementById('editBankingUser').required = true;
+          document.getElementById('editBankingPassword').required = true;
+          document.getElementById('editNewPassword').required = false;
+          
+        } else if (bankingCard.classList.contains('debit-card')) {
+          // Debit Card Edit
+          document.getElementById('editModalTitle').textContent = 'Edit Debit Card';
+          document.getElementById('editPasswordType').value = 'debit';
+          
+          setupCardEdit(bankingCard);
+          
+        } else if (bankingCard.classList.contains('credit-card')) {
+          // Credit Card Edit
+          document.getElementById('editModalTitle').textContent = 'Edit Credit Card';
+          document.getElementById('editPasswordType').value = 'credit';
+          
+          setupCardEdit(bankingCard);
+        }
+      } else {
+        // This is a regular password - show regular fields
+        setupRegularPasswordEdit();
+      }
+      
+      document.getElementById('editModal').style.display = 'flex';
+    }
+  });
+
+  // Helper function for card edit setup
+  function setupCardEdit(bankingCard) {
+    // Show card fields, hide others
+    document.getElementById('regularPasswordFields').style.display = 'none';
+    document.getElementById('bankingCardFields').style.display = 'block';
+    document.getElementById('onlineBankingFields').style.display = 'none';
+    
+    // Pre-fill current values
+    const cardField = bankingCard.querySelector('[data-type="CARD"]');
+    const expField = bankingCard.querySelector('[data-type="EXP"]');
+    const cvvField = bankingCard.querySelector('[data-type="CVV"]');
+    
+    if (cardField) {
+      document.getElementById('editCardNumber').value = cardField.getAttribute('data-raw') || '';
+    }
+    if (expField) {
+      document.getElementById('editExpiry').value = expField.getAttribute('data-raw') || '';
+    }
+    if (cvvField) {
+      document.getElementById('editCVV').value = cvvField.getAttribute('data-raw') || '';
+    }
+    
+    // Make card fields required
+    document.getElementById('editCardNumber').required = true;
+    document.getElementById('editExpiry').required = true;
+    document.getElementById('editCVV').required = true;
+    document.getElementById('editNewPassword').required = false;
+  }
+
+  // Delete functionality
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('delete-password') || e.target.classList.contains('delete-banking')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const service = e.target.getAttribute('data-service');
+      const account = e.target.getAttribute('data-account');
+      document.getElementById('deleteService').value = service;
+      document.getElementById('deleteAccount').value = account;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+  });
+
+  // Modal functionality
+  window.closeModal = function() {
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.style.display = 'none';
+    });
+    
+    // Reset form fields
+    document.getElementById('editNewPassword').value = '';
+    document.getElementById('editCardNumber').value = '';
+    document.getElementById('editExpiry').value = '';
+    document.getElementById('editCVV').value = '';
+    document.getElementById('editBankingUser').value = '';
+    document.getElementById('editBankingPassword').value = '';
+    
+    // Reset required attributes
+    document.getElementById('editNewPassword').required = true;
+    document.getElementById('editCardNumber').required = false;
+    document.getElementById('editExpiry').required = false;
+    document.getElementById('editCVV').required = false;
+    document.getElementById('editBankingUser').required = false;
+    document.getElementById('editBankingPassword').required = false;
+  };
+
+  window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+      closeModal();
+    }
+  };
+
+  // Toast notification
+  window.showToast = function(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  };
+});
+
+function setupRegularPasswordEdit() {
+  document.getElementById('editModalTitle').textContent = 'Edit Password';
+  document.getElementById('editPasswordType').value = 'regular';
+  
+  // Show regular fields, hide banking fields
+  document.getElementById('regularPasswordFields').style.display = 'block';
+  document.getElementById('bankingCardFields').style.display = 'none';
+  document.getElementById('onlineBankingFields').style.display = 'none';
+  
+  // Make regular password field required
+  document.getElementById('editNewPassword').required = true;
+}
+
+// ENHANCED SEARCH FUNCTIONS WITH SESSION-PERSISTENT GLOBAL SEARCH UNLOCK
+
+// Global search functions - FIXED: Persistent unlock per session
+function showGlobalSearchModal() {
+  document.getElementById("globalSearchModal").style.display = "flex";
+  
+  // Check if global search was already unlocked this session
+  if (sessionStorage.getItem('globalSearchUnlocked') === 'true') {
+    document.getElementById("globalSearchStepOTP").style.display = "none";
+    document.getElementById("globalSearchStepForm").style.display = "block";
+  } else {
+    document.getElementById("globalSearchStepOTP").style.display = "block";
+    document.getElementById("globalSearchStepForm").style.display = "none";
+  }
+}
+
+function closeGlobalSearchModal() {
+  document.getElementById("globalSearchModal").style.display = "none";
+  document.getElementById("globalSearchOtp").value = "";
+  document.getElementById("globalSearchQuery").value = "";
+  document.getElementById("globalSearchResults").innerHTML = "";
+}
+
+function verifyGlobalSearchOTP() {
+  let otp = document.getElementById("globalSearchOtp").value;
+  fetch("/global-search-otp", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({otp: otp})
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      // FIXED: Store unlock state in session storage
+      sessionStorage.setItem('globalSearchUnlocked', 'true');
+      
+      document.getElementById("globalSearchStepOTP").style.display = "none";
+      document.getElementById("globalSearchStepForm").style.display = "block";
+    } else {
+      showToast("Invalid OTP. Please try again.");
+    }
+  })
+  .catch(err => {
+    showToast("Error verifying OTP. Please try again.");
+  });
+}
+
+// Clear global search unlock on vault lock
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('lock-vault-btn') || e.target.closest('.lock-vault-btn')) {
+    sessionStorage.removeItem('globalSearchUnlocked');
+  }
+});
+
+function performGlobalSearch() {
+  let query = document.getElementById("globalSearchQuery").value;
+  if (!query.trim()) {
+    showToast("Please enter a search term.");
+    return;
+  }
+  
+  fetch("/global-search", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({query: query})
+  })
+  .then(res => res.json())
+  .then(data => {
+    let results = data.results || [];
+    let output = "";
+    
+    if (results.length === 0) {
+      output = "<p style='color:#888; text-align:center; padding:20px;'>No passwords found matching your search.</p>";
+    } else {
+      output = results.map(r => {
+        // Check if this is a banking password with TYPE: prefix
+        if (r.collection.toLowerCase() === 'banking' && r.password.startsWith('TYPE:')) {
+          return renderBankingSearchResult(r);
+        } else {
+          return renderRegularSearchResult(r);
+        }
+      }).join("");
+    }
+    
+    document.getElementById("globalSearchResults").innerHTML = output;
+  })
+  .catch(err => {
+    showToast("Search failed. Please try again.");
+  });
+}
+
+// Enhanced search result rendering functions
+function renderBankingSearchResult(result) {
+  const fields = result.password.split('|');
+  const cardType = fields[0].split(':')[1]?.toLowerCase() || 'debit';
+  
+  let cardDetails = '';
+  fields.slice(1).forEach(field => {
+    const [key, value] = field.split(':');
+    if (!value) return;
+    
+    if (key === 'CARD') {
+      cardDetails += `
+        <div class="card-field" data-field="number">
+          <div class="field-label">Card Number</div>
+          <div class="field-value banking-field" data-type="CARD" data-raw="${value}">
+            ${value.slice(0,4)} •••• •••• ${value.slice(-4)}
+          </div>
+        </div>`;
+    } else if (key === 'EXP') {
+      cardDetails += `
+        <div class="card-field">
+          <div class="field-label">Expiry Date</div>
+          <div class="field-value banking-field" data-type="EXP" data-raw="${value}">••/••</div>
+        </div>`;
+    } else if (key === 'CVV') {
+      cardDetails += `
+        <div class="card-field">
+          <div class="field-label">CVV</div>
+          <div class="field-value banking-field" data-type="CVV" data-raw="${value}">***</div>
+        </div>`;
+    } else if (key === 'USER') {
+      cardDetails += `
+        <div class="card-field">
+          <div class="field-label">Account Holder</div>
+          <div class="field-value banking-field" data-type="USER" data-raw="${value}">${value.toUpperCase()}</div>
+        </div>`;
+    } else if (key === 'PASS') {
+      cardDetails += `
+        <div class="card-field">
+          <div class="field-label">PIN/Password</div>
+          <div class="field-value banking-field" data-type="PASS" data-raw="${value}">••••••••</div>
+        </div>`;
+    }
+  });
+  
+  return `
+    <div class="password-item" style="border-left:4px solid var(--button-bg);">
+      <div class="password-header">
+        <div class="service-info">
+          <strong>🔍 ${result.service}</strong> <span style="color:#666;">(${result.collection})</span><br>
+          <small style="color:#666;">Account: ${result.account}</small>
+        </div>
+      </div>
+      <div class="search-result-banking-card ${cardType}-card">
+        <div class="search-chip"></div>
+        <div class="card-type">${cardType.charAt(0).toUpperCase() + cardType.slice(1)} Card</div>
+        <div class="card-details">
+          ${cardDetails}
+        </div>
+        <div class="actions-row">
+          <button class="action-btn toggle-item-visibility">👁️ View</button>
+          <button class="action-btn copy-banking">📋 Copy</button>
+          <button class="action-btn edit-banking" data-service="${result.service}" data-account="${result.account}">✏️ Edit</button>
+          <button class="action-btn delete-banking" data-service="${result.service}" data-account="${result.account}">🗑️ Delete</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderRegularSearchResult(result) {
+  return `
+    <div class="password-item" style="border-left:4px solid var(--button-bg);">
+      <div class="password-header">
+        <div class="service-info">
+          <strong>🔍 ${result.service}</strong> <span style="color:#666;">(${result.collection})</span><br>
+          <small style="color:#666;">Account: ${result.account}</small>
+        </div>
+      </div>
+      <div class="regular-password">
+        <div>
+          <div class="field-label" style="font-size:11px;color:#666;margin-bottom:5px;">PASSWORD</div>
+          <div class="password-value" data-raw="${result.password}">••••••••••••</div>
+        </div>
+        <div class="actions-row">
+          <button class="action-btn toggle-password">👁️</button>
+          <button class="action-btn copy-password" data-password="${result.password}">📋</button>
+          <button class="action-btn edit-password" data-service="${result.service}" data-account="${result.account}">✏️</button>
+          <button class="action-btn delete-password" data-service="${result.service}" data-account="${result.account}">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// Per-collection search functions - ENHANCED
+function toggleCollectionSearch(c) {
+  let bar = document.getElementById(c + "-search-bar");
+  if (bar) {
+    bar.style.display = (bar.style.display === "none" || !bar.style.display) ? "block" : "none";
+    if (bar.style.display === "none") {
+      clearCollectionSearch(c);
+    }
+  }
+}
+
+function searchCollection(c) {
+  let query = document.getElementById(c + "-search-input").value;
+  if (!query.trim()) {
+    showToast("Please enter a search term.");
+    return;
+  }
+  
+  fetch("/collection-search", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({collection: c, query: query})
+  })
+  .then(res => res.json())
+  .then(data => {
+    let results = data.results || [];
+    let output = "";
+    
+    if (results.length === 0) {
+      output = "<p style='color:#888; text-align:center; padding:15px;'>No matches found in this collection.</p>";
+    } else {
+      output = results.map(r => {
+        // Check if this is a banking password with TYPE: prefix
+        if (c === 'banking' && r.password.startsWith('TYPE:')) {
+          return renderBankingSearchResult(r);
+        } else {
+          return renderRegularSearchResult(r);
+        }
+      }).join("");
+    }
+    
+    document.getElementById(c + "-search-results").innerHTML = output;
+    
+    // Hide original items when showing search results
+    const vaultItems = document.getElementById(c + "-vault-items");
+    if (vaultItems && results.length > 0) {
+      vaultItems.style.display = "none";
+    }
+  })
+  .catch(err => {
+    showToast("Search failed. Please try again.");
+  });
+}
+
+function clearCollectionSearch(c) {
+  document.getElementById(c + "-search-input").value = "";
+  document.getElementById(c + "-search-results").innerHTML = "";
+  
+  // Show original items again
+  const vaultItems = document.getElementById(c + "-vault-items");
+  if (vaultItems) {
+    vaultItems.style.display = "block";
+  }
+}
+</script>
+
+{% endblock %}

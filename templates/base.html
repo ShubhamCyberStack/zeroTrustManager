@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Zero Trust Password Manager{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <!-- Theme Toggle Button - Fixed Position Top Right -->
+  <button class="theme-toggle-btn" onclick="cycleTheme()" title="Toggle theme">☀️</button>
+  
+  <!-- Main Content Area -->
+  {% block content %}{% endblock %}
+
+  <!-- Theme Toggle Script -->
+  <script src="{{ url_for('static', filename='theme-toggle.js') }}"></script>
+</body>
+</html>

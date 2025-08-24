@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .hero {
+    min-height: 100vh;
+    background: white;
+    background-image: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text);
+    text-align: center;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  /* Theme-aware gradient backgrounds - REMOVED for white background */
+  body.light .hero {
+    background: white;
+    background-image: none;
+  }
+
+  body.dark .hero {
+    background: white;
+    background-image: none;
+  }
+
+  body.autumn .hero {
+    background: white;
+    background-image: none;
+  }
+
+  body.rain .hero {
+    background: white;
+    background-image: none;
+  }
+
+  body.spring .hero {
+    background: white;
+    background-image: none;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(0,0,0,0.02)"/><circle cx="75" cy="75" r="1" fill="rgba(0,0,0,0.02)"/><circle cx="50" cy="10" r="1" fill="rgba(0,0,0,0.015)"/><circle cx="10" cy="60" r="1" fill="rgba(0,0,0,0.015)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    z-index: 1;
+  }
+  
+  .hero-content {
+    max-width: 1000px;
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 4rem 3rem;
+    box-shadow: 0 20px 60px var(--card-shadow);
+    border: 1px solid var(--input-border);
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+  }
+
+  .hero h1 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    font-weight: 900;
+    letter-spacing: -2px;
+    color: var(--text);
+  }
+
+  .hero-subtitle {
+    font-size: 1.6rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    opacity: 0.8;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .cta-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-primary {
+    background: var(--button-bg);
+    color: var(--button-text);
+    box-shadow: 0 8px 30px var(--card-shadow);
+  }
+
+  .cta-primary:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 40px var(--card-shadow);
+  }
+
+  .cta-secondary {
+    background: var(--input-bg);
+    color: var(--text);
+    border: 2px solid var(--input-border);
+    backdrop-filter: blur(10px);
+  }
+
+  .cta-secondary:hover {
+    background: var(--card);
+    transform: translateY(-3px) scale(1.05);
+    border-color: var(--button-bg);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .feature-card {
+    background: var(--card);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    transition: all 0.4s ease;
+    border: 1px solid var(--input-border);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px var(--card-shadow);
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .feature-card:hover::before {
+    left: 100%;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-8px);
+    background: var(--card);
+    box-shadow: 0 20px 40px var(--card-shadow);
+  }
+
+  .feature-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+  }
+
+  .feature-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  .feature-desc {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    opacity: 0.8;
+    color: var(--text);
+  }
+
+  .security-badges {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    background: var(--input-bg);
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid var(--input-border);
+    backdrop-filter: blur(5px);
+    color: var(--text);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero {
+      padding: 1rem;
+    }
+    
+    .hero-content {
+      padding: 2.5rem 2rem;
+      margin: 1rem;
+    }
+    
+    .hero h1 {
+      font-size: 2.8rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.3rem;
+    }
+    
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .cta-btn {
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero h1 {
+      font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .feature-card {
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>
+
+<section class="hero">
+  <div class="hero-content">
+    <!-- Main Headline -->
+    <h1>🛡️ Zero Trust Password Manager</h1>
+    
+    <!-- Subtitle -->
+    <p class="hero-subtitle">
+      Secure password management with multi-factor authentication, encrypted storage, and smart collection organization for your digital security.
+    </p>
+    
+    <!-- Call to Action Buttons -->
+    <div class="cta-buttons">
+      <a href="{{ url_for('register') }}" class="cta-btn cta-primary">🚀 Create Account</a>
+      <a href="{{ url_for('login') }}" class="cta-btn cta-secondary">🔐 Sign In</a>
+    </div>
+
+    <!-- Security Badges -->
+    <div class="security-badges">
+      <span class="badge">🔒 End-to-End Encryption</span>
+      <span class="badge">🛡️ Multi-Factor Auth</span>
+      <span class="badge">⚡ Zero Trust Security</span>
+    </div>
+
+    <!-- Feature Grid - Only Real Project Features -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🔐</span>
+        <div class="feature-title">Multi-Factor Authentication</div>
+        <p class="feature-desc">TOTP-based authentication with Google Authenticator support and security question verification.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🗄️</span>
+        <div class="feature-title">Smart Collections</div>
+        <p class="feature-desc">Organize passwords into Banking, Social Media, and Other collections with individual unlock control.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🏦</span>
+        <div class="feature-title">Banking Vault</div>
+        <p class="feature-desc">Specialized storage for debit/credit cards and online banking with secure field masking.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <div class="feature-title">Encrypted Storage</div>
+        <p class="feature-desc">All passwords encrypted with Fernet encryption using your master password as the key.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">🎨</span>
+        <div class="feature-title">5 Theme System</div>
+        <p class="feature-desc">Beautiful themes including Light, Dark, Autumn, Rain, and Spring modes for personalized experience.</p>
+      </div>
+      
+      <div class="feature-card">
+        <span class="feature-icon">⏰</span>
+        <div class="feature-title">Auto-Lock Security</div>
+        <p class="feature-desc">Automatic vault and collection locking after 2 minutes of inactivity for enhanced security.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
