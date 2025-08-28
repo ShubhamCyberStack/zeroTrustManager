@@ -149,10 +149,17 @@ def login():
         username = request.form["username"].strip().lower()
         password = request.form["password"]
         otp_code = request.form.get("otp")
+        question = request.form.get("security_question")
+        answer = request.form.get("security_answer", "").lower().strip()
 
         user = users_col.find_one({"username": username})
         if not user or not bcrypt.checkpw(password.encode(), user["password"]):
             flash("Login failed!")
+            return render_template("login.html", questions=SECURITY_QUESTIONS)
+
+        # Security question/answer check
+        if question != user.get("question") or answer != user.get("answer", "").lower().strip():
+            flash("Security question or answer is incorrect.")
             return render_template("login.html", questions=SECURITY_QUESTIONS)
 
         totp = pyotp.TOTP(user["mfa"])
@@ -160,16 +167,34 @@ def login():
             flash("OTP failed!")
             return render_template("login.html", questions=SECURITY_QUESTIONS)
 
-        session["username"] = username
-        session["role"] = user.get("role", "user")
-        session["key"] = derive_key_from_password(password).decode()
-        session["unlocked"] = True
-        session["unlocked_collections"] = {"banking": False, "social": False, "other": False}
-        session["otp_verified"] = False
-        session["last_activity"] = time.time()
+    session["username"] = username
+    session["role"] = user.get("role", "user")
+    session["key"] = derive_key_from_password(password).decode()
+    session["unlocked"] = False
+    session["unlocked_collections"] = {"banking": False, "social": False, "other": False}
+    session["otp_verified"] = False
+    session["last_activity"] = time.time()
 
-        log_audit(username, "login", "User logged in")
-        return redirect("/dashboard")
+    log_audit(username, "login", "User logged in")
+    return redirect("/unlock-vault")
+@app.route('/unlock-vault', methods=["GET", "POST"])
+def unlock_vault():
+    if "username" not in session:
+        return redirect("/login")
+    username = session["username"]
+    if request.method == "POST":
+        otp = request.form["otp"]
+        user = users_col.find_one({"username": username})
+        totp = pyotp.TOTP(user["mfa"])
+        if totp.verify(otp):
+            session["unlocked"] = True
+            session["last_activity"] = time.time()
+            log_audit(username, "vault_unlock", "Vault unlocked after login")
+            flash("Vault unlocked!")
+            return redirect("/dashboard")
+        else:
+            flash("Invalid OTP!")
+    return render_template("unlock_vault.html")
 
     return render_template("login.html", questions=SECURITY_QUESTIONS)
 
@@ -177,6 +202,8 @@ def login():
 def dashboard():
     if "username" not in session:
         return redirect("/login")
+    if not session.get("unlocked"):
+        return redirect("/unlock-vault")
 
     username = session["username"]
 
@@ -701,3 +728,4 @@ def relock():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
