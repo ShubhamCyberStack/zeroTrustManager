@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>👤 User Details: {{ user.username }}</h1>
+    
+    <div class="user-info-card">
+        <h2>📋 User Information</h2>
+        <table class="info-table">
+            <tr>
+                <td><strong>Username</strong></td>
+                <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+                <td><strong>Role</strong></td>
+                <td>
+                    <span class="role-badge {{ 'admin' if user.role == 'admin' else 'user' }}">
+                        {{ user.role or 'user' }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Security Question</strong></td>
+                <td>{{ user.question or 'Not set' }}</td>
+            </tr>
+            <tr>
+                <td><strong>Answer</strong></td>
+                <td>🔒 Encrypted</td>
+            </tr>
+            <tr>
+                <td><strong>MFA Secret</strong></td>
+                <td>🔒 {{ user.mfa }}</td>
+            </tr>
+            <tr>
+                <td><strong>Super Secret Key</strong></td>
+                <td>🔒 {{ user.super_secret_key or 'Not set' }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="vault-info-card">
+        <h2>🔐 Vault Contents ({{ vault_entries|length }} items)</h2>
+        {% if vault_entries %}
+        <div class="vault-table-container">
+            <table class="vault-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Account</th>
+                        <th>Collection</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in vault_entries %}
+                    <tr>
+                        <td>🔒 Encrypted</td>
+                        <td>🔒 Encrypted</td>
+                        <td>
+                            <span class="collection-badge {{ entry.collection }}">
+                                {{ entry.collection|title }}
+                            </span>
+                        </td>
+                        <td>{{ entry.timestamp.strftime('%Y-%m-%d %H:%M') if entry.timestamp else 'Unknown' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="no-data">No vault entries found for this user.</p>
+        {% endif %}
+    </div>
+    
+    <div class="admin-nav">
+        <a href="/admin/users" class="nav-btn">← Back to Users</a>
+        <a href="/admin/choice" class="nav-btn">🏠 Admin Menu</a>
+        {% if user.role != 'admin' %}
+        <form method="post" action="/admin/delete-user/{{ user.username }}" 
+              style="display: inline;"
+              onsubmit="return confirm('Are you sure you want to delete user {{ user.username }}? This will delete all their vault data!')">
+            <button type="submit" class="nav-btn danger">🗑️ Delete User</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.user-info-card, .vault-info-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 20px var(--card-shadow);
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.info-table td {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--input-border);
+    vertical-align: top;
+}
+
+.info-table td:first-child {
+    width: 200px;
+    font-weight: 600;
+}
+
+.role-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    background: #ff6b6b;
+    color: white;
+}
+
+.role-badge.user {
+    background: #4ecdc4;
+    color: white;
+}
+
+.vault-table-container {
+    overflow-x: auto;
+    margin-top: 15px;
+}
+
+.vault-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+}
+
+.vault-table th, .vault-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.vault-table th {
+    background: var(--input-bg);
+    font-weight: 600;
+}
+
+.collection-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.collection-badge.banking {
+    background: #ff9f43;
+    color: white;
+}
+
+.collection-badge.social {
+    background: #5f27cd;
+    color: white;
+}
+
+.collection-badge.other {
+    background: #00d2d3;
+    color: white;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    margin: 20px 0;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    padding: 12px 24px;
+    background: var(--button-bg);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.nav-btn:hover {
+    background: #174ea6;
+}
+
+.nav-btn.danger {
+    background: #ff6b6b;
+}
+
+.nav-btn.danger:hover {
+    background: #ee5a52;
+}
+</style>
+{% endblock %}

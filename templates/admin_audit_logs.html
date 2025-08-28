@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>📋 Audit Logs</h1>
+    
+    <div class="logs-info">
+        <p><strong>Total logs:</strong> {{ total_logs }} | <strong>Page:</strong> {{ page }} | <strong>Showing:</strong> {{ logs|length }} entries</p>
+    </div>
+    
+    <div class="logs-table-container">
+        <table class="logs-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>IP Address</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr class="log-entry">
+                    <td class="timestamp">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="username">
+                        <strong>{{ log.username }}</strong>
+                    </td>
+                    <td class="action">
+                        <span class="action-badge {{ log.action.replace('_', '-') }}">
+                            {{ log.action.replace('_', ' ').title() }}
+                        </span>
+                    </td>
+                    <td class="ip">{{ log.ip_address or 'Unknown' }}</td>
+                    <td class="details">{{ log.details or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="/admin/audit-logs?page={{ page - 1 }}" class="page-btn">← Previous</a>
+        {% endif %}
+        
+        <span class="page-info">Page {{ page }}</span>
+        
+        {% if logs|length == per_page %}
+        <a href="/admin/audit-logs?page={{ page + 1 }}" class="page-btn">Next →</a>
+        {% endif %}
+    </div>
+    
+    <div class="admin-nav">
+        <a href="/admin/choice" class="nav-btn">🏠 Back to Menu</a>
+        <a href="/admin/dashboard" class="nav-btn">📊 Dashboard</a>
+    </div>
+</div>
+
+<style>
+.logs-info {
+    background: var(--input-bg);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid var(--input-border);
+}
+
+.logs-table-container {
+    overflow-x: auto;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--card-shadow);
+    margin: 20px 0;
+}
+
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.logs-table th, .logs-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--input-border);
+    font-size: 0.9rem;
+}
+
+.logs-table th {
+    background: var(--input-bg);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+
+.timestamp {
+    font-family: monospace;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.username {
+    color: var(--button-bg);
+}
+
+.action-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.action-badge.login {
+    background: #4ecdc4;
+    color: white;
+}
+
+.action-badge.logout {
+    background: #ff6b6b;
+    color: white;
+}
+
+.action-badge.register {
+    background: #45b7d1;
+    color: white;
+}
+
+.action-badge.vault-unlock {
+    background: #96ceb4;
+    color: white;
+}
+
+.action-badge.add-password {
+    background: #ffeaa7;
+    color: #2d3436;
+}
+
+.action-badge.edit-password {
+    background: #fd79a8;
+    color: white;
+}
+
+.action-badge.delete-password {
+    background: #e84393;
+    color: white;
+}
+
+.action-badge.auto-lock {
+    background: #a29bfe;
+    color: white;
+}
+
+.action-badge.admin-delete-user {
+    background: #d63031;
+    color: white;
+}
+
+.action-badge.audit-cleanup {
+    background: #6c5ce7;
+    color: white;
+}
+
+.ip {
+    font-family: monospace;
+    font-size: 0.8rem;
+}
+
+.details {
+    max-width: 200px;
+    word-wrap: break-word;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.page-btn {
+    padding: 8px 16px;
+    background: var(--button-bg);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.page-btn:hover {
+    background: #174ea6;
+}
+
+.page-info {
+    padding: 8px 16px;
+    background: var(--input-bg);
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.nav-btn {
+    padding: 12px 24px;
+    background: var(--button-bg);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.nav-btn:hover {
+    background: #174ea6;
+}
+</style>
+{% endblock %}

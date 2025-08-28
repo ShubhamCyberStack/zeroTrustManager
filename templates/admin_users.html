@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>👥 User Management</h1>
+    
+    <div class="users-table-container">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Security Question</th>
+                    <th>Vault Items</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><strong>{{ user.username }}</strong></td>
+                    <td>
+                        <span class="role-badge {{ 'admin' if user.role == 'admin' else 'user' }}">
+                            {{ user.role or 'user' }}
+                        </span>
+                    </td>
+                    <td>{{ user.question or 'Not set' }}</td>
+                    <td>{{ user.vault_count }} items</td>
+                    <td class="actions">
+                        <a href="/admin/user/{{ user.username }}" class="action-link view">👁️ View</a>
+                        {% if user.role != 'admin' %}
+                        <form method="post" action="/admin/delete-user/{{ user.username }}" 
+                              style="display: inline;" 
+                              onsubmit="return confirm('Are you sure you want to delete user {{ user.username }}?')">
+                            <button type="submit" class="action-link delete">🗑️ Delete</button>
+                        </form>
+                        {% else %}
+                        <span class="action-link disabled">🔒 Protected</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="admin-nav">
+        <a href="/admin/choice" class="nav-btn">🏠 Back to Menu</a>
+        <a href="/admin/dashboard" class="nav-btn">📊 Dashboard</a>
+    </div>
+</div>
+
+<style>
+.users-table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--card-shadow);
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.users-table th, .users-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.users-table th {
+    background: var(--input-bg);
+    font-weight: 600;
+    color: var(--text);
+}
+
+.role-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    background: #ff6b6b;
+    color: white;
+}
+
+.role-badge.user {
+    background: #4ecdc4;
+    color: white;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.action-link {
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.action-link.view {
+    background: #4ecdc4;
+    color: white;
+}
+
+.action-link.delete {
+    background: #ff6b6b;
+    color: white;
+}
+
+.action-link.disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.nav-btn {
+    padding: 12px 24px;
+    background: var(--button-bg);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.nav-btn:hover {
+    background: #174ea6;
+}
+</style>
+{% endblock %}
