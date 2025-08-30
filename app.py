@@ -32,56 +32,26 @@ SECURITY_QUESTIONS = {
     "company_name": "What is your favorite company?",
 }
 
-# 🧹 Enhanced function to delete audit logs older than 1 day when server restarts
+# Delete audit logs older than 1 day when server restarts
 def delete_old_audit_logs():
-    try:
-        cutoff = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-        result = audit_logs_col.delete_many({'timestamp': {'$lt': cutoff}})
-        print(f"🧹 Audit Log Cleanup: Deleted {result.deleted_count} old audit logs (older than 1 day)")
-        
-        # Also log this cleanup action
-        audit_logs_col.insert_one({
-            "username": "system",
-            "action": "audit_cleanup",
-            "timestamp": datetime.datetime.utcnow(),
-            "ip_address": "server",
-            "details": f"Deleted {result.deleted_count} audit logs older than 1 day on server restart"
-        })
-    except Exception as e:
-        print(f"❌ Error during audit log cleanup: {str(e)}")
+    cutoff = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+    audit_logs_col.delete_many({'timestamp': {'$lt': cutoff}})
 
-# Execute cleanup on server startup
 delete_old_audit_logs()
 
-def log_audit(username, action, details=""):
-    try:
-        ip = request.remote_addr if request else "unknown"
-        timestamp = datetime.datetime.utcnow()
-        audit_logs_col.insert_one({
-            "username": username,
-            "action": action,
-            "timestamp": timestamp,
-            "ip_address": ip,
-            "details": details
-        })
-    except Exception as e:
-        print(f"Error logging audit: {str(e)}")
+def derive_key_from_password(password):
+    return base64.urlsafe_b64encode(hashlib.sha256(password.encode()).digest())
 
-# 🔐 Admin authentication decorator
-def admin_required(f):
-    def decorated_function(*args, **kwargs):
-        if "username" not in session:
-            flash("Please login first.")
-            return redirect("/login")
-        
-        user = users_col.find_one({"username": session["username"]})
-        if not user or user.get("role") != "admin":
-            flash("Admin access required.")
-            return redirect("/dashboard")
-        
-        return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__
-    return decorated_function
+def log_audit(username, action, details=""):
+    ip = request.remote_addr
+    timestamp = datetime.datetime.utcnow()
+    audit_logs_col.insert_one({
+        "username": username,
+        "action": action,
+        "timestamp": timestamp,
+        "ip_address": ip,
+        "details": details
+    })
 
 @app.route('/')
 def index():
@@ -110,7 +80,7 @@ def register():
                     errors.append("one lowercase letter")
                 if not any(c.isdigit() for c in pw):
                     errors.append("one number")
-                if not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/~`" for c in pw):
+                if not any(c in "!@#$%^&*()_+-=[]{}|;:',./<>?/~`" for c in pw):
                     errors.append("one special character")
                 if user in pw.lower():
                     errors.append("must not contain username")
@@ -182,200 +152,45 @@ def register():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-<<<<<<< HEAD
         username = request.form["username"].strip().lower()
         password = request.form["password"]
         otp_code = request.form.get("otp")
         question = request.form.get("security_question")
         answer = request.form.get("security_answer", "").lower().strip()
-
+        
         user = users_col.find_one({"username": username})
+        
         if not user or not bcrypt.checkpw(password.encode(), user["password"]):
             flash("Login failed!")
             return render_template("login.html", questions=SECURITY_QUESTIONS)
-
+        
         # Security question/answer check
         if question != user.get("question") or answer != user.get("answer", "").lower().strip():
             flash("Security question or answer is incorrect.")
             return render_template("login.html", questions=SECURITY_QUESTIONS)
-
+        
         totp = pyotp.TOTP(user["mfa"])
         if not totp.verify(otp_code):
             flash("OTP failed!")
             return render_template("login.html", questions=SECURITY_QUESTIONS)
-
-    session["username"] = username
-    session["role"] = user.get("role", "user")
-    session["key"] = derive_key_from_password(password).decode()
-    session["unlocked"] = False
-    session["unlocked_collections"] = {"banking": False, "social": False, "other": False}
-    session["otp_verified"] = False
-    session["last_activity"] = time.time()
-
-    log_audit(username, "login", "User logged in")
-    return redirect("/unlock-vault")
-@app.route('/unlock-vault', methods=["GET", "POST"])
-def unlock_vault():
-    if "username" not in session:
-        return redirect("/login")
-    username = session["username"]
-    if request.method == "POST":
-        otp = request.form["otp"]
-        user = users_col.find_one({"username": username})
-        totp = pyotp.TOTP(user["mfa"])
-        if totp.verify(otp):
-            session["unlocked"] = True
-            session["last_activity"] = time.time()
-            log_audit(username, "vault_unlock", "Vault unlocked after login")
-            flash("Vault unlocked!")
-            return redirect("/dashboard")
-        else:
-            flash("Invalid OTP!")
-    return render_template("unlock_vault.html")
-
-=======
-        try:
-            username = request.form["username"].strip().lower()
-            password = request.form["password"]
-            otp_code = request.form.get("otp")
-            question = request.form.get("security_question")
-            answer = request.form.get("security_answer", "").lower().strip()
-            
-            user = users_col.find_one({"username": username})
-            
-            if not user or not bcrypt.checkpw(password.encode(), user["password"]):
-                flash("Login failed!")
-                return render_template("login.html", questions=SECURITY_QUESTIONS)
-            
-            # Security question/answer check
-            if question != user.get("question") or answer != user.get("answer", "").lower().strip():
-                flash("Security question or answer is incorrect.")
-                return render_template("login.html", questions=SECURITY_QUESTIONS)
-            
-            totp = pyotp.TOTP(user["mfa"])
-            if not totp.verify(otp_code):
-                flash("OTP failed!")
-                return render_template("login.html", questions=SECURITY_QUESTIONS)
-            
-            session["username"] = username
-            session["role"] = user.get("role", "user")
-            session["key"] = derive_key_from_password(password).decode()
-            session["unlocked"] = False
-            session["unlocked_collections"] = {"banking": False, "social": False, "other": False}
-            session["otp_verified"] = False
-            session["last_activity"] = time.time()
-            
-            log_audit(username, "login", "User logged in")
-            
-            # Redirect admin to admin choice page
-            if user.get("role") == "admin":
-                return redirect("/admin/choice")
-            else:
-                return redirect("/unlock-vault")
         
-        except Exception as e:
-            flash("Login error occurred. Please try again.")
-            return render_template("login.html", questions=SECURITY_QUESTIONS)
+        session["username"] = username
+        session["role"] = user.get("role", "user")
+        session["key"] = derive_key_from_password(password).decode()
+        session["unlocked"] = False
+        session["unlocked_collections"] = {"banking": False, "social": False, "other": False}
+        session["otp_verified"] = False
+        session["last_activity"] = time.time()
+        
+        log_audit(username, "login", "User logged in")
+        
+        # Redirect admin users to admin choice page
+        if user.get("role") == "admin":
+            return redirect("/admin/choice")
+        else:
+            return redirect("/unlock-vault")
     
->>>>>>> 26f0f9e (Added complete admin panel with full MFA/Super Secret key display and encrypted data placeholders)
     return render_template("login.html", questions=SECURITY_QUESTIONS)
-
-# 🔥 ADMIN ROUTES 🔥
-
-@app.route('/admin/choice')
-@admin_required
-def admin_choice():
-    return render_template("admin_choice.html")
-
-@app.route('/admin/dashboard')
-@admin_required
-def admin_dashboard():
-    # Get statistics
-    total_users = users_col.count_documents({})
-    total_passwords = vault_col.count_documents({})
-    recent_logins = audit_logs_col.count_documents({
-        "action": "login",
-        "timestamp": {"$gte": datetime.datetime.utcnow() - datetime.timedelta(days=1)}
-    })
-    
-    # Get recent audit logs
-    recent_logs = list(audit_logs_col.find().sort("timestamp", -1).limit(10))
-    
-    return render_template("admin_dashboard.html", 
-                         total_users=total_users,
-                         total_passwords=total_passwords,
-                         recent_logins=recent_logins,
-                         recent_logs=recent_logs)
-
-@app.route('/admin/simple-dashboard')
-@admin_required
-def admin_simple_dashboard():
-    # Get basic statistics
-    user_count = users_col.count_documents({})
-    password_count = vault_col.count_documents({})
-    
-    return render_template("admin_simple_dashboard.html",
-                         user_count=user_count,
-                         password_count=password_count)
-
-@app.route('/admin/users')
-@admin_required
-def admin_users():
-    users = list(users_col.find({}, {"password": 0}))  # Exclude password field
-    
-    # Get vault count for each user
-    for user in users:
-        user['vault_count'] = vault_col.count_documents({"username": user["username"]})
-    
-    return render_template("admin_users.html", users=users)
-
-@app.route('/admin/user/<username>')
-@admin_required
-def admin_user_detail(username):
-    user = users_col.find_one({"username": username}, {"password": 0})
-    if not user:
-        flash("User not found.")
-        return redirect("/admin/users")
-    
-    # Get user's vault entries
-    vault_entries = list(vault_col.find({"username": username}))
-    
-    return render_template("admin_user_detail.html", user=user, vault_entries=vault_entries)
-
-@app.route('/admin/audit-logs')
-@admin_required
-def admin_audit_logs():
-    # Get recent audit logs with pagination
-    page = int(request.args.get('page', 1))
-    per_page = 50
-    skip = (page - 1) * per_page
-    
-    logs = list(audit_logs_col.find().sort("timestamp", -1).skip(skip).limit(per_page))
-    total_logs = audit_logs_col.count_documents({})
-    
-    return render_template("admin_audit_logs.html", 
-                         logs=logs, 
-                         page=page, 
-                         total_logs=total_logs,
-                         per_page=per_page)
-
-@app.route('/admin/delete-user/<username>', methods=['POST'])
-@admin_required
-def admin_delete_user(username):
-    if username == "admin":
-        flash("Cannot delete admin user!")
-        return redirect("/admin/users")
-    
-    # Delete user and their vault
-    users_col.delete_one({"username": username})
-    vault_col.delete_many({"username": username})
-    
-    log_audit(session["username"], "admin_delete_user", f"Admin deleted user: {username}")
-    flash(f"User {username} deleted successfully!")
-    
-    return redirect("/admin/users")
-
-# Continue with existing routes...
 
 @app.route('/unlock-vault', methods=["GET", "POST"])
 def unlock_vault():
@@ -404,16 +219,10 @@ def unlock_vault():
 def dashboard():
     if "username" not in session:
         return redirect("/login")
-<<<<<<< HEAD
-    if not session.get("unlocked"):
-        return redirect("/unlock-vault")
-
-=======
     
     if not session.get("unlocked"):
         return redirect("/unlock-vault")
     
->>>>>>> 26f0f9e (Added complete admin panel with full MFA/Super Secret key display and encrypted data placeholders)
     username = session["username"]
     
     # Auto-lock vault after inactivity
@@ -555,7 +364,6 @@ def dashboard():
                 flash("Invalid OTP!")
     
     vaults = {"banking": [], "social": [], "other": []}
-    
     if session.get("unlocked"):
         key = session["key"].encode()
         fernet = Fernet(key)
@@ -759,14 +567,10 @@ def forgot_password():
         
         elif step == "2":
             username = session.get("reset_user")
-            if not username:
-                flash("Session expired.")
-                return render_template("forgot_password.html", step=1, questions=SECURITY_QUESTIONS)
-            
             user = users_col.find_one({"username": username})
             otp = request.form["otp"]
-            totp = pyotp.TOTP(user["mfa"])
             
+            totp = pyotp.TOTP(user["mfa"])
             if not totp.verify(otp):
                 flash("Invalid OTP.")
                 return render_template("forgot_password.html", step=2, questions=SECURITY_QUESTIONS)
@@ -775,10 +579,6 @@ def forgot_password():
         
         elif step == "3":
             username = session.get("reset_user")
-            if not username:
-                flash("Session expired.")
-                return render_template("forgot_password.html", step=1, questions=SECURITY_QUESTIONS)
-            
             user = users_col.find_one({"username": username})
             super_secret_key_input = request.form.get("super_secret_key", "").strip()
             
@@ -798,7 +598,7 @@ def forgot_password():
                     e.append("one lowercase")
                 if not any(c.isdigit() for c in pw):
                     e.append("one number")
-                if not any(c in "!@#$%^&*()_+-=[]{}|;:',.<>?/~`" for c in pw):
+                if not any(c in "!@#$%^&*()_+-=[]{}|;:',./<>?/~`" for c in pw):
                     e.append("one special")
                 if usern.lower() in pw.lower():
                     e.append("no username in password")
@@ -831,20 +631,14 @@ def forgot_password():
             if choice == "yes":
                 new_secret = pyotp.random_base32()
                 otp_uri = pyotp.TOTP(new_secret).provisioning_uri(name=username, issuer_name="ZeroTrustManager")
-                
                 users_col.update_one({"username": username}, {"$set": {"mfa": new_secret}})
                 session["new_mfa_secret"] = new_secret
-                
                 return render_template("show_new_secret.html", otp_uri=otp_uri, secret=new_secret)
         
         elif step == "5":
             username = session.get("reset_user")
             new_secret = session.get("new_mfa_secret")
             otp_code = request.form.get("otp", "")
-            
-            if not username or not new_secret:
-                flash("Session expired.")
-                return redirect("/login")
             
             totp = pyotp.TOTP(new_secret)
             if not totp.verify(otp_code):
@@ -884,9 +678,9 @@ def delete_user():
                 return render_template("delete_user.html", questions=SECURITY_QUESTIONS, step="1")
             
             return render_template("delete_user.html", step="2",
-                                username=username, password=password,
-                                security_question=question, security_answer=answer,
-                                questions=SECURITY_QUESTIONS)
+                                 username=username, password=password,
+                                 security_question=question, security_answer=answer,
+                                 questions=SECURITY_QUESTIONS)
         
         elif step == "2":
             username = request.form["username"]
@@ -905,15 +699,15 @@ def delete_user():
             if not totp.verify(otp):
                 flash("Invalid OTP.")
                 return render_template("delete_user.html", step="2",
-                                    username=username, password=password,
-                                    security_question=question, security_answer=answer,
-                                    questions=SECURITY_QUESTIONS)
+                                     username=username, password=password,
+                                     security_question=question, security_answer=answer,
+                                     questions=SECURITY_QUESTIONS)
             
             return render_template("delete_user.html", step="3",
-                                username=username, password=password,
-                                security_question=question, security_answer=answer,
-                                otp=otp,
-                                questions=SECURITY_QUESTIONS)
+                                 username=username, password=password,
+                                 security_question=question, security_answer=answer,
+                                 otp=otp,
+                                 questions=SECURITY_QUESTIONS)
         
         elif step == "3":
             username = request.form["username"]
@@ -933,17 +727,17 @@ def delete_user():
             if not totp.verify(otp):
                 flash("Invalid OTP.")
                 return render_template("delete_user.html", step="2",
-                                    username=username, password=password,
-                                    security_question=question, security_answer=answer,
-                                    questions=SECURITY_QUESTIONS)
+                                     username=username, password=password,
+                                     security_question=question, security_answer=answer,
+                                     questions=SECURITY_QUESTIONS)
             
             if super_secret_key_input != user.get("super_secret_key"):
                 flash("Invalid Super Secret Key.")
                 return render_template("delete_user.html", step="3",
-                                    username=username, password=password,
-                                    security_question=question, security_answer=answer,
-                                    otp=otp,
-                                    questions=SECURITY_QUESTIONS)
+                                     username=username, password=password,
+                                     security_question=question, security_answer=answer,
+                                     otp=otp,
+                                     questions=SECURITY_QUESTIONS)
             
             vault_col.delete_many({"username": username})
             users_col.delete_one({"username": username})
@@ -960,10 +754,104 @@ def relock():
     session["unlocked"] = False
     session["unlocked_collections"] = {"banking": False, "social": False, "other": False}
     session["otp_verified"] = False
-    
     log_audit(username, "vault_relock", "Vault was relocked manually")
     return redirect("/dashboard")
 
+# Admin Routes
+@app.route('/admin/choice')
+def admin_choice():
+    if "username" not in session or session.get("role") != "admin":
+        return redirect("/login")
+    
+    return render_template("admin_choice.html")
+
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    if "username" not in session or session.get("role") != "admin":
+        return redirect("/login")
+    
+    # Get statistics
+    total_users = users_col.count_documents({})
+    admin_users = users_col.count_documents({"role": "admin"})
+    regular_users = users_col.count_documents({"role": {"$ne": "admin"}})
+    total_vault_entries = vault_col.count_documents({})
+    
+    recent_activities = list(audit_logs_col.find({}).sort("timestamp", -1).limit(10))
+    
+    stats = {
+        "total_users": total_users,
+        "admin_users": admin_users,
+        "regular_users": regular_users,
+        "total_vault_entries": total_vault_entries,
+        "recent_activities": recent_activities
+    }
+    
+    return render_template("admin_dashboard.html", stats=stats)
+
+@app.route('/admin/users')
+def admin_users():
+    if "username" not in session or session.get("role") != "admin":
+        return redirect("/login")
+    
+    users = list(users_col.find({}, {"password": 0}))
+    for user in users:
+        vault_count = vault_col.count_documents({"username": user["username"]})
+        user["vault_count"] = vault_count
+    
+    return render_template("admin_users.html", users=users)
+
+@app.route('/admin/user/<username>')
+def admin_user_detail(username):
+    if "username" not in session or session.get("role") != "admin":
+        return redirect("/login")
+    
+    user = users_col.find_one({"username": username})
+    if not user:
+        flash("User not found.")
+        return redirect("/admin/users")
+    
+    vault_entries = list(vault_col.find({"username": username}))
+    
+    return render_template("admin_user_detail.html", user=user, vault_entries=vault_entries)
+
+@app.route('/admin/delete-user/<username>', methods=["POST"])
+def admin_delete_user(username):
+    if "username" not in session or session.get("role") != "admin":
+        return redirect("/login")
+    
+    if username == session["username"]:
+        flash("You cannot delete your own admin account.")
+        return redirect("/admin/users")
+    
+    user = users_col.find_one({"username": username})
+    if not user:
+        flash("User not found.")
+        return redirect("/admin/users")
+    
+    if user.get("role") == "admin":
+        flash("Cannot delete another admin account.")
+        return redirect("/admin/users")
+    
+    vault_col.delete_many({"username": username})
+    users_col.delete_one({"username": username})
+    
+    log_audit(session["username"], "admin_delete_user", f"Admin deleted user {username}")
+    flash(f"User {username} and all their data deleted successfully.")
+    
+    return redirect("/admin/users")
+
+@app.route('/admin/audit-logs')
+def admin_audit_logs():
+    if "username" not in session or session.get("role") != "admin":
+        return redirect("/login")
+    
+    page = request.args.get('page', 1, type=int)
+    per_page = 50
+    
+    logs = list(audit_logs_col.find({}).sort("timestamp", -1).skip((page-1)*per_page).limit(per_page))
+    total_logs = audit_logs_col.count_documents({})
+    
+    return render_template("admin_audit_logs.html", logs=logs, page=page, total_logs=total_logs, per_page=per_page)
+
 if __name__ == "__main__":
     app.run(debug=True)
-
